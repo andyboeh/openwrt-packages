@@ -1,0 +1,45 @@
+include $(TOPDIR)/rules.mk
+
+PKG_NAME:=phytool
+PKG_RELEASE:=1
+
+PKG_RELEASE=$(PKG_SOURCE_VERSION)
+
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/andyboeh/wasp_uploader.git
+PKG_SOURCE_DATE:=2019-12-16
+
+PKG_LICENSE:=GPL-2.0
+PKG_LICENSE_FILES:=COPYING
+
+PKG_MAINTAINER:=Andreas Boehler <dev@aboehler.at>
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/wasp_uploader
+  SECTION:=base
+  CATEGORY:=System
+  TITLE:=AVM WASP firmware uploader
+  URL:=https://github.com/andyboeh/wasp_uploader.git
+endef
+
+define Package/wasp_uploader/description
+   Uploade firmware to AVM WASP devices
+endef
+
+define Build/Configure
+endef
+
+define Build/Compile
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+		CC="$(TARGET_CC)" \
+		CFLAGS="$(TARGET_CFLAGS) -Wall" \
+		LDFLAGS="$(TARGET_LDFLAGS)"
+endef
+
+define Package/phytool/install
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wasp_uploader $(1)/usr/bin/
+endef
+
+$(eval $(call BuildPackage,wasp_uploader))
