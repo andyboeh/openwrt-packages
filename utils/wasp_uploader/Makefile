@@ -11,6 +11,8 @@ PKG_SOURCE_DATE:=2019-12-16
 
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=COPYING
+PKG_MIRROR_HASH=:=skip
+PKG_SOURCE_VERSION=8d18006f8a48d37463a681aa06e05ff4d84db29e
 
 PKG_MAINTAINER:=Andreas Boehler <dev@aboehler.at>
 
@@ -24,7 +26,7 @@ define Package/wasp_uploader
 endef
 
 define Package/wasp_uploader/description
-   Uploade firmware to AVM WASP devices
+   Upload firmware to AVM WASP devices
 endef
 
 define Build/Configure
