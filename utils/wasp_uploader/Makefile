@@ -12,7 +12,7 @@ PKG_SOURCE_DATE:=2019-12-16
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=COPYING
 PKG_MIRROR_HASH=:=skip
-PKG_SOURCE_VERSION=8d18006f8a48d37463a681aa06e05ff4d84db29e
+PKG_SOURCE_VERSION=1423458a627e5ca37b7e65260e60d07e6c3688ad
 
 PKG_MAINTAINER:=Andreas Boehler <dev@aboehler.at>
 
@@ -20,7 +20,7 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/wasp_uploader
   SECTION:=base
-  CATEGORY:=System
+  CATEGORY:=Utilities
   TITLE:=AVM WASP firmware uploader
   URL:=https://github.com/andyboeh/wasp_uploader.git
 endef
