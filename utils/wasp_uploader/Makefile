@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=phytool
+PKG_NAME:=wasp_uploader
 PKG_RELEASE:=1
 
 PKG_RELEASE=$(PKG_SOURCE_VERSION)
@@ -19,7 +19,7 @@ PKG_MAINTAINER:=Andreas Boehler <dev@aboehler.at>
 include $(INCLUDE_DIR)/package.mk
 
 define Package/wasp_uploader
-  SECTION:=base
+  SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=AVM WASP firmware uploader
   URL:=https://github.com/andyboeh/wasp_uploader.git
@@ -39,7 +39,7 @@ define Build/Compile
 		LDFLAGS="$(TARGET_LDFLAGS)"
 endef
 
-define Package/phytool/install
+define Package/wasp_uploader/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wasp_uploader $(1)/usr/bin/
 endef
