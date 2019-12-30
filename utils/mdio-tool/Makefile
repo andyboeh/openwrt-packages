@@ -6,13 +6,13 @@ PKG_RELEASE:=1
 PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/Menion2k/mdio-tool
+PKG_SOURCE_URL:=https://github.com/andyboeh/mdio-tool
 PKG_SOURCE_DATE:=2019-12-30
 
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=COPYING
 PKG_MIRROR_HASH=:=skip
-PKG_SOURCE_VERSION=ab16e7f374367c7313de9448db8420ee686f924b
+PKG_SOURCE_VERSION=511df09c8fb99fb3f16a60034a2ad49d18752ab3
 
 PKG_MAINTAINER:=Andreas Boehler <dev@aboehler.at>
 
@@ -22,7 +22,7 @@ define Package/mdio-tool
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=MDIO Tool
-  URL:=https://github.com/Menion2k/mdio-tool.git
+  URL:=https://github.com/andyboeh/mdio-tool.git
 endef
 
 define Package/mdio-tool/description
