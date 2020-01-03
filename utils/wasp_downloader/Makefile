@@ -42,8 +42,7 @@ endef
 define Package/wasp_downloader/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wasp_downloader $(1)/usr/bin/
-	$(INSTALL_DIR) $(1)/lib/preinit
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/files/lib/preinit/90_wasp_downloader $(1)/lib/preinit
+	[ -d ./files ] && $(CP) ./files/* $(1)/
 endef
 
 $(eval $(call BuildPackage,wasp_downloader))
