@@ -12,7 +12,7 @@ PKG_SOURCE_DATE:=2019-12-16
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=COPYING
 PKG_MIRROR_HASH=:=skip
-PKG_SOURCE_VERSION=5054fd504d65a7fb2009b18677f2156466c8f6c7
+PKG_SOURCE_VERSION=8a126792f2b57c353f7516510a039b6f67f94163
 
 PKG_MAINTAINER:=Andreas Boehler <dev@aboehler.at>
 
@@ -43,6 +43,8 @@ define Package/wasp_uploader/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wasp_uploader_stage1 $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wasp_uploader_stage2 $(1)/usr/bin/
+	$(INSTALL_DIR) $(1)/opt/wasp
+	$(CP) $(PKG_BUILD_DIR)/files/upload-wasp.sh $(1)/opt/wasp/
 endef
 
 $(eval $(call BuildPackage,wasp_uploader))
