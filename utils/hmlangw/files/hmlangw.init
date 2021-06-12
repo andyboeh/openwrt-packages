@@ -1,0 +1,28 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2021 Andreas Boehler
+
+START=75
+STOP=10
+
+USE_PROCD=1
+PROG=/usr/bin/hmlangw
+
+start_service() {
+	local enabled
+	
+	config_load hmlangw
+	
+	config_get_bool enabled global enabled 0
+	[ "$enabled" -gt 0 ] || return 0
+
+	config_get serialnumber global serialnumber
+	config_get device global device
+
+	procd_open_instance
+	procd_set_param command "$PROG" -n "$serialnumber" -s "$device" -r -1
+	procd_close_instance
+}
+
+service_triggers() {
+	procd_add_reload_trigger "hmlangw"
+}
