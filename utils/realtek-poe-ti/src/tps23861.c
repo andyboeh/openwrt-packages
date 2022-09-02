@@ -18,7 +18,7 @@
 #include <stdbool.h>
 #include <fcntl.h>
 #include <unistd.h>
-
+#include <endian.h>
 
 #include "tps23861.h"
 
@@ -44,6 +44,9 @@
 #define TPS23861_PORT_1_STATUS_REG                      0x0c
 #define TPS23861_SECOND_CLASSIFICATION_REG              0x21
 #define TPS23861_SECOND_CLASSIFICATION_ALL_ON           0x55
+#define TPS23861_PORT_1_CURRENT_REG                     0x30
+#define TPS23861_PORT_1_VOLTAGE_REG                     0x32
+#define TPS23861_GENERAL_MASK_1_REG                     0x17
 
 #define TPS23861_DETECT_STATE_UNKNOWN                   0x00
 #define TPS23861_DETECT_STATE_SHORT_CIRCUIT             0x01
@@ -66,6 +69,8 @@
 #define TPS23861_CLASS_STATE_CLASS_0                    0x06
 #define TPS23861_CLASS_STATE_OVERCURRENT                0x07
 #define TPS23861_CLASS_STATE_CLASS_MISMATCH             0x08
+
+#define TPS23861_VOLTAGE_LSB                            3662
 
 static int current_addr = -1;
 static int current_bus_number = -1;
@@ -154,10 +159,37 @@ int tps23861_init(struct tps23861_dev *dev) {
     if(tps23861_write_reg(dev, TPS23861_SECOND_CLASSIFICATION_REG, TPS23861_SECOND_CLASSIFICATION_ALL_ON) < 0)
         return 1;
 
+    // Set current sense register value
+    val = tps23861_read_reg(dev, TPS23861_GENERAL_MASK_1_REG);
+    if(val < 0)
+        return 1;
+
+    if(dev->shunt_resistor == 255000)
+        val &= ~(1 << 0);
+    else
+        val |= (1 << 0);
+
+    if(tps23861_write_reg(dev, TPS23861_GENERAL_MASK_1_REG, val) < 0)
+        return 1;
+
     return 0;
 }
 
 int tps23861_get_voltage(struct tps23861_dev *dev, int channel, long *val) {
+    uint16_t tmp;
+    int lsb;
+    int msb;
+
+    lsb = tps23861_read_reg(dev, TPS23861_PORT_1_VOLTAGE_REG + (channel * 4));     // LSB
+    msb = (tps23861_read_reg(dev, TPS23861_PORT_1_VOLTAGE_REG + (channel * 4) + 1)); // MSB
+
+    if(lsb < 0 || msb < 0)
+        return 1;
+
+    tmp = (msb | (lsb << 8));
+
+    *val = (le16toh(tmp) * TPS23861_VOLTAGE_LSB) / 1000;
+
     return 0;
 }
 
@@ -166,6 +198,26 @@ int tps23861_get_temperature(struct tps23861_dev *dev, long *val) {
 }
 
 int tps23861_get_current(struct tps23861_dev *dev, int channel, long *val) {
+    uint16_t tmp;
+    int lsb;
+    int msb;
+    int base_value;
+
+    lsb = tps23861_read_reg(dev, TPS23861_PORT_1_CURRENT_REG + (channel * 4));     // LSB
+    msb = (tps23861_read_reg(dev, TPS23861_PORT_1_CURRENT_REG + (channel * 4) + 1)); // MSB
+
+    if(lsb < 0 || msb < 0)
+        return 1;
+
+    tmp = (msb | (lsb << 8));
+
+    if(dev->shunt_resistor == 255000)
+        base_value = 61039;
+    else
+        base_value = 62260;
+
+    *val = (le16toh(tmp) * base_value) / 1000000;
+
     return 0;
 }
 

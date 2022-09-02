@@ -57,16 +57,10 @@ struct port_state {
 };
 
 struct state {
-    const char *sys_mode;
-    unsigned char sys_version;
-    const char *sys_mcu;
-    const char *sys_status;
-    unsigned char sys_ext_version;
     float power_consumption;
     unsigned int num_detected_ports;
 
     struct port_state ports[MAX_PORT];
-    struct uloop_timeout mcu_error_timeout;
 };
 
 struct tps_map {
@@ -83,7 +77,7 @@ struct tps23861_config {
 };
 
 //static struct ustream_fd stream;
-//static struct state state;
+static struct state state;
 static struct blob_buf b;
 static struct tps23861_config tps23861_config;
 
@@ -257,13 +251,40 @@ static void poe_init() {
 
 static void poe_get_port_status() {
     size_t i;
+    long voltage, current;
+    float watt;
+    const char *class_status;
+    const char *detect_status;
+    float total_consumption = 0;
 
     for(i=0; i<config.port_count; i++) {
-        ULOG_DBG("Port %zu status: %s, %s\n", i+1,
-                 tps23861_get_detect_status(tps23861_config.tps_map[i].dev, tps23861_config.tps_map[i].channel),
-                 tps23861_get_class_status(tps23861_config.tps_map[i].dev, tps23861_config.tps_map[i].channel)
+        tps23861_get_voltage(tps23861_config.tps_map[i].dev, tps23861_config.tps_map[i].channel, &voltage);
+        tps23861_get_current(tps23861_config.tps_map[i].dev, tps23861_config.tps_map[i].channel, &current);
+        detect_status = tps23861_get_detect_status(tps23861_config.tps_map[i].dev, tps23861_config.tps_map[i].channel);
+        class_status = tps23861_get_class_status(tps23861_config.tps_map[i].dev, tps23861_config.tps_map[i].channel);
+        watt = (voltage * current) / 1000000.0;
+        ULOG_DBG("Port %zu status: %s, %s, %ld mV, %ld mA, %f W\n", i+1,
+                 detect_status,
+                 class_status,
+                 voltage,
+                 current,
+                 watt
                 );
+        if(!config.ports[i].valid)
+            state.ports[i].status = "Disabled";
+        else {
+            if(voltage == 0 || current == 0) {
+                state.ports[i].status = "Searching";
+                state.ports[i].watt = 0;
+            } else {
+                state.ports[i].status = "Delivering power";
+                state.ports[i].watt = (voltage * current) / 1000000.0;
+                total_consumption += watt;
+            }
+            state.ports[i].poe_mode = class_status;
+        }
     }
+    state.power_consumption = total_consumption;
 }
 
 static void state_timeout_cb(struct uloop_timeout *t) {
@@ -277,16 +298,11 @@ static int ubus_poe_info_cb(struct ubus_context *ctx, struct ubus_object *obj,
                             struct blob_attr *msg)
 {
     //char tmp[16];
-    //size_t i;
-    //void *c;
+    size_t i;
+    void *c;
 
     blob_buf_init(&b, 0);
-/*
-    snprintf(tmp, sizeof(tmp), "v%u.%u",
-         state.sys_version, state.sys_ext_version);
-    blobmsg_add_string(&b, "firmware", tmp);
-    if (state.sys_mcu)
-        blobmsg_add_string(&b, "mcu", state.sys_mcu);
+
     blobmsg_add_double(&b, "budget", config.budget);
     blobmsg_add_double(&b, "consumption", state.power_consumption);
 
@@ -313,7 +329,7 @@ static int ubus_poe_info_cb(struct ubus_context *ctx, struct ubus_object *obj,
     blobmsg_close_table(&b, p);
     }
     blobmsg_close_table(&b, c);
-*/
+
     ubus_send_reply(ctx, req, b.head);
 
     return UBUS_STATUS_OK;
@@ -339,9 +355,9 @@ static int ubus_poe_manage_cb(struct ubus_context *ctx, struct ubus_object *obj,
                               struct blob_attr *msg)
 {
     struct blob_attr *tb[ARRAY_SIZE(ubus_poe_manage_policy)];
-    //const struct port_config *port;
-    //const char *port_name;
-    //size_t i;
+    const struct port_config *port;
+    const char *port_name;
+    size_t i;
 
     blobmsg_parse(ubus_poe_manage_policy,
                   ARRAY_SIZE(ubus_poe_manage_policy),
@@ -349,13 +365,13 @@ static int ubus_poe_manage_cb(struct ubus_context *ctx, struct ubus_object *obj,
     if (!tb[0] || !tb[1])
         return UBUS_STATUS_INVALID_ARGUMENT;
 
-    //port_name = blobmsg_get_string(tb[0]);
-/*    for (i = 0; i < config.port_count; i++) {
+    port_name = blobmsg_get_string(tb[0]);
+    for (i = 0; i < config.port_count; i++) {
         port = &config.ports[i];
-        if (port->enable && !strcmp(port_name, port->name))
-            return poe_cmd_port_enable(i, blobmsg_get_bool(tb[1]));
+        if (port->valid && !strcmp(port_name, port->name))
+            return tps23861_set_port_power(tps23861_config.tps_map[i].dev, tps23861_config.tps_map[i].channel, blobmsg_get_bool(tb[1]));
     }
-*/
+
     return UBUS_STATUS_INVALID_ARGUMENT;
 }
 
