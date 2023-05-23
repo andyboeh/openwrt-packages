@@ -1,0 +1,74 @@
+diff --git a/Makefile b/Makefile
+index 50f8408..dd251bd 100755
+--- a/Makefile
++++ b/Makefile
+@@ -1,4 +1,3 @@
+-CC       = gcc
+ LIBS     = -lreadline
+ CFLAGS   = -O2 -g -Wno-unused-result -Wunused
+ 
+@@ -24,47 +23,47 @@ ptable.o: ptable.c
+ #	$(CC) -c qcio.c
+ 
+ qcommand: qcommand.o  $(OBJS)
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ qrmem: qrmem.o $(OBJS)
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ qrflash: qrflash.o $(OBJS) ptable.o
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ qwflash: qwflash.o $(OBJS)
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ #qwimage: qwimage.o $(OBJS)
+-#	gcc $^ -o $@ $(LIBS)
++#	$(CC) $^ -o $@ $(LIBS)
+ 
+ qdload: qdload.o sahara.o $(OBJS)  ptable.o
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ qwdirect: qwdirect.o $(OBJS)  ptable.o
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 	
+ qefs  : qefs.o efsio.o $(OBJS)
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ qnvram  : qnvram.o $(OBJS)
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 	
+ mibibsplit: mibibsplit.o $(OBJS)
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ qblinfo:    qblinfo.o $(OBJS)
+-	gcc $^ -o $@  $(LIBS)
++	$(CC) $^ -o $@  $(LIBS)
+ 
+ qident:      qident.o $(OBJS)
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ qterminal:   qterminal.o $(OBJS)
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ qbadblock:   qbadblock.o $(OBJS)  ptable.o
+-	gcc $^ -o $@ $(LIBS)
++	$(CC) $^ -o $@ $(LIBS)
+ 
+ qflashparm:  qflashparm.o $(OBJS)
+-	gcc $^ -o $@ $(LIBS)
+-	
+\ No newline at end of file
++	$(CC) $^ -o $@ $(LIBS)
++	
