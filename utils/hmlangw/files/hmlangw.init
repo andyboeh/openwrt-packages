@@ -17,9 +17,11 @@ start_service() {
 
 	config_get serialnumber global serialnumber
 	config_get device global device
+	config_get bootloader global bootloader 1
 
 	procd_open_instance
 	procd_set_param command "$PROG" -n "$serialnumber" -s "$device" -r -1
+	[ "$bootloader" -gt 0 ] || procd_append_param command -b
 	procd_close_instance
 }
 
