@@ -1,13 +1,18 @@
 diff --git a/Makefile b/Makefile
-index 50f8408..dd251bd 100755
+index 50f8408..4aeb98a 100755
 --- a/Makefile
 +++ b/Makefile
-@@ -1,4 +1,3 @@
+@@ -1,6 +1,6 @@
 -CC       = gcc
- LIBS     = -lreadline
- CFLAGS   = -O2 -g -Wno-unused-result -Wunused
+-LIBS     = -lreadline
+-CFLAGS   = -O2 -g -Wno-unused-result -Wunused
++LIBS     = -static -static-libgcc -lreadline -ltinfo
++CFLAGS   = -O2 -g -Wno-unused-result -Wunused -Wl,-Bstatic
++
  
-@@ -24,47 +23,47 @@ ptable.o: ptable.c
+ OBJS     = hdlc.o  qcio.o memio.o chipconfig.o
+ 
+@@ -24,47 +24,47 @@ ptable.o: ptable.c
  #	$(CC) -c qcio.c
  
  qcommand: qcommand.o  $(OBJS)

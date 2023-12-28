@@ -30,19 +30,13 @@ endef
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \
 		CC="$(TARGET_CC)" \
-		CFLAGS="$(TARGET_CFLAGS) -Wall" \
-		LDFLAGS="$(TARGET_LDFLAGS)"
+		CFLAGS="$(TARGET_CFLAGS) -Wall -static -static-libgcc -D_STATIC" \
+		LDFLAGS="$(TARGET_LDFLAGS) -static -static-libgcc"
 endef
 
 define Package/qtools/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/qcommand $(1)/usr/bin/
-
-#	$(INSTALL_DIR) $(1)/etc/config
-#	$(INSTALL_CONF) ./files/hmlangw.config $(1)/etc/config/hmlangw
-
-#	$(INSTALL_DIR) $(1)/etc/init.d
-#	$(INSTALL_BIN) ./files/hmlangw.init $(1)/etc/init.d/hmlangw
 endef
 
 $(eval $(call BuildPackage,qtools))
